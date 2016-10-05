@@ -33,3 +33,10 @@ In 1937, the NCAA introduced classification, but many teams weren't officially c
 In 1973, these two divisions further divided into Divisions I, II, and III.
 
 In 1978, Division I split yet again into I-A and I-AA, which would later be renamed FBS and FCS, respectively.
+
+## Python Packages Used
+
+* requests
+* beautifulsoup
+* re
+* datetime
