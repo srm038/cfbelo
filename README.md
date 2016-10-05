@@ -18,9 +18,11 @@ College is much more complicated, if even by the additional number of teams. CFB
 
 * Include all teams for which data is available. With this, we run into the problem of choosing initial Elo values for multiple levels of teams.
 
-* Include all teams that are currently FBS, as well as any teams during which time they were in the top division (e.g., Princeton pre-1930s).
+* Include all teams that are currently FBS, as well as any teams during which time they were in the top division (e.g., Princeton pre-1930s). This has the disadvantage of "locking" the ratings to this particular year (2016). This can theoretically be solved by including every team for which there is data up until classification, so that there's a value in the system for that team should they rejoin FBS later. Expansion is not as simple as in the professional leagues, since classification is much more complicated. Many teams dropped down to Division II in the 70s, only to make their way back up to the FBS ranks. It's not inconceivable that could happen again, and we want to be sure that our ranking is more or less immutable. For example, Bowling Green's 1920 game against Defiance College should have the same value whether or not Defiance ever makes it up out of Div III (admittedly unlikely). We could take data from all teams until 1937 (or appropriate re-classification) and let them maintain their (mean-regressed) Elo until the event they rejoined FBS.
 
-* Include only current FBS teams.
+* Include only current FBS teams. Again, we run into the problem of how to handle expansion teams.
+
+Once we've chosen our set of teams, we are always going to be faced with the problem of how to handle games outside that set. This will always be a problem because early in football's history, teams would regularly play high schools, YMCAs, and other athletic groups. We could probably safely ignore these games (though I guarantee you those schools still count the wins!).
 
 ### History
 
