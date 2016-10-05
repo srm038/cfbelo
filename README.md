@@ -24,6 +24,15 @@ College is much more complicated, if even by the additional number of teams. CFB
 
 Once we've chosen our set of teams, we are always going to be faced with the problem of how to handle games outside that set. This will always be a problem because early in football's history, teams would regularly play high schools, YMCAs, and other athletic groups. We could probably safely ignore these games (though I guarantee you those schools still count the wins!).
 
+#### Notability Standards
+
+One helpful thing I could do is implement a kind of notability standard. This would filter the data to a point of usability without sacrificing historic programs. For example, should the [Carlisle Indians](https://en.wikipedia.org/wiki/Carlisle_Indians_football) be included?
+
+A team must meet one of the following criteria:
+
+1. Is a current FBS program
+2. Was in the top division of football at some point in history (University Division, Division I, Division I-A)
+
 ### History
 
 The NCAA as we know it wasn't founded until 1906 as the IAAUS, almost 40 years after the first football game.
