@@ -15,8 +15,7 @@ r4 = re.compile('\\\\')
 r5 = re.compile(';')
 
 def get_url(url):
-    """
-    """
+    """Connect to the cfb website and return the raw page html"""
 
     response = req.get(url)
     html = response.content
@@ -24,7 +23,7 @@ def get_url(url):
     
     return soup
     
-def add_games(games_page):
+def add_games(t, games_page):
     """
     """
     
@@ -44,7 +43,7 @@ def add_games(games_page):
                 r1.sub('',
                     ','.join([g.text for g in games])))))
     # save what we've got so far
-    with open(games_file, 'a') as f:
+    with open(GAMES_FILE, 'a') as f:
         f.write(games_text)
         f.write('\n')
 
@@ -52,12 +51,21 @@ def add_games(games_page):
 # need to expand later to get all teams during the time they were D1?
 # anyway, everything comes from this page and related lists
 soup = get_url('http://cfbdatawarehouse.com/data/div_ia_team_index.php')
-team_urls = [link.get('href')[:-9] for link in soup.find_all('a') if 'active' in link.get('href')]
-team_names = [link.text for link in soup.find_all('a') if 'active' in link.get('href')]
+team_urls = [link.get('href')[:-9] for link in soup.find_all('a')
+    if 'active' in link.get('href')]
+team_names = [link.text for link in soup.find_all('a')
+    if 'active' in link.get('href')]
+for t, name in enumerate(team_names):
+	if ';' in name: team_names[t] = name[:-1]
+
+GAMES_FILE = r'allgames.txt'
 
 # create or clear out existing data file
-games_file = r'allgames.txt'
-open(games_file, 'w').close()
+def clear_file():
+    """
+    """
+    
+    open(GAMES_FILE, 'w').close()
 
 # loop through the D1 teams and grab all the game data
 
@@ -66,17 +74,22 @@ open(games_file, 'w').close()
 # team_urls = team_urls[:5]
 # years = years[:5]
 
-print('Getting games by team...')
-for t, team in enumerate(team_urls):
-    soup = get_url('http://cfbdatawarehouse.com/data/' + str(team) + 'index.php')
+def get_games():
+    """
+    """
+    print('Getting games by team...')
     
-    years = [link.get('href') for link in soup.find_all('a') if 'yearly_results' in link.get('href')]
-    
-    for year in years:
-        games_page ='http://cfbdatawarehouse.com/data/' + str(team) + str(year)
-        add_games(games_page)
+    for t, team in enumerate(team_urls):
+        soup = get_url('http://cfbdatawarehouse.com/data/' + team + 'index.php')
         
-def clean_up(games_file):
+        years = [link.get('href') for link in soup.find_all('a')
+            if 'yearly_results' in link.get('href')]
+        
+        for year in years:
+            games_page ='http://cfbdatawarehouse.com/data/' + str(team) + str(year)
+            add_games(t, games_page)
+        
+def clean_up(GAMES_FILE):
     """
     """
     
@@ -90,7 +103,7 @@ def clean_up(games_file):
     # in case things go wrong
     # they probably will
     
-    with open(games_file, 'r') as f:
+    with open(GAMES_FILE, 'r') as f:
         for line in f:
             games_list.append(line.split(','))
                 
@@ -103,6 +116,7 @@ def clean_up(games_file):
             try: score2 = int(g[5])
             except ValueError: score2 = int(g[6])
             games_dict.append({
+                'season': int(date[:4]) - (int(date[5:7]) < 7),
                 'date': date,
                 'team1': g[2],
                 'score1': int(g[3]),
@@ -127,6 +141,7 @@ def clean_up(games_file):
     # set is best type of search here at O(1) * O(n)
     for g in games_dict:
         forward = ','.join([
+                str(g['season']),
                 g['date'],
                 g['team1'],
                 str(g['score1']),
@@ -134,6 +149,7 @@ def clean_up(games_file):
                 str(g['score2']),
                 ])
         reverse = ','.join([
+                str(g['season']),
                 g['date'],
                 g['team2'],
                 str(g['score2']),
@@ -149,11 +165,12 @@ def clean_up(games_file):
     print('# of unique games: ' + str(len(unique_games)))
 
     # clean out the data file
-    open(games_file, 'w').close()
+    open(GAMES_FILE, 'w').close()
 
     # save the newly cleaned data back to the data file
-    with open(games_file, 'a') as f:
+    with open(GAMES_FILE, 'a') as f:
         for g in unique_games:
             f.write(g + '\n')
 
-clean_up(games_file)
+# get_games()
+# clean_up(GAMES_FILE)
