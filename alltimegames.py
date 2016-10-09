@@ -17,7 +17,15 @@ r5 = re.compile(';')
 def get_url(url):
     """Connect to the cfb website and return the raw page html"""
 
-    response = req.get(url)
+    # sometimes the page doesnt respond right away
+    # this just tries one more time to make sure it responds
+    try:
+        response = req.get(url)
+    except:
+        try:
+            response = req.get(url)
+        except:
+            print(url)
     html = response.content
     soup = bs(html, 'html.parser')
     
@@ -27,13 +35,7 @@ def add_games(t, games_page):
     """
     """
     
-    # sometimes the page doesnt respond right away
-    # this just tries one more time to make sure it responds
-    try:
-        soup = get_url(games_page)
-    except:
-            try: soup = get_url(games_page)
-            except: print(games_page)
+    soup = get_url(games_page)
     # this is the format for games on the cfbdatawarehouse site (FOR NOW)
     games = soup.find_all('td', attrs = {'bgcolor': '#E1D2D2'})
     # clean up the resulting code a bit so its one game per line
@@ -50,11 +52,15 @@ def add_games(t, games_page):
 # grab names and urls of current D1 teams
 # need to expand later to get all teams during the time they were D1?
 # anyway, everything comes from this page and related lists
-soup = get_url('http://cfbdatawarehouse.com/data/div_ia_team_index.php')
-team_urls = [link.get('href')[:-9] for link in soup.find_all('a')
-    if 'active' in link.get('href')]
-team_names = [link.text for link in soup.find_all('a')
-    if 'active' in link.get('href')]
+team_urls = []
+team_names = []
+for div in ['iii', 'ii', 'iaa', 'ia']:
+    soup = get_url('http://cfbdatawarehouse.com/data/div_' + div + '_team_index.php')
+    for link in soup.find_all('a'):
+        if 'active' in link.get('href'):
+            team_urls.append(link.get('href')[:-9])
+            team_names.append(link.text)
+
 for t, name in enumerate(team_names):
 	if ';' in name: team_names[t] = name[:-1]
 

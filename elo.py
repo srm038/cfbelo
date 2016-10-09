@@ -1,7 +1,10 @@
 import alltimegames
+import teams
+
 from math import log
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 
 K = 17
 INIT = 1500
@@ -64,6 +67,13 @@ def set_elo(team, elo):
         current_elo.update({team: elo})
     else:
         pass
+
+def top_div(team, year):
+    """
+    Returns True if a team is currently in the top division at the time
+    """
+    
+    return int(year) in teams.top_division[team]
         
 def elo(game):
     """
