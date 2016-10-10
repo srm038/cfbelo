@@ -1,3 +1,5 @@
+import teams
+
 import requests as req
 from bs4 import BeautifulSoup as bs
 import re
@@ -61,9 +63,20 @@ for div in ['iii', 'ii', 'iaa', 'ia']:
             team_urls.append(link.get('href')[:-9])
             team_names.append(link.text)
 
-for t, name in enumerate(team_names):
-	if ';' in name: team_names[t] = name[:-1]
+soup = get_url('http://cfbdatawarehouse.com/data/discontinued_programs.php')
+for link in soup.find_all('a'):
+    if 'active' in link.get('href') or 'discontinued/' in link.get('href'):
+        team_urls.append(link.get('href')[:-9])
+        team_names.append(link.text)
 
+for t, name in enumerate(team_names):
+	if ';' in name: team_names[t] = re.sub(';', '', name)
+
+for i, t in enumerate(team_names):
+    if t not in teams.top_division:
+        del team_names[i]
+        del team_urls[i]
+    
 GAMES_FILE = r'allgames.txt'
 
 # create or clear out existing data file
@@ -117,10 +130,15 @@ def clean_up(GAMES_FILE):
         try:
             # need to be able to handle year-only games better
             # for now, they go at the beginning of the season-ish
+            if (g[2] not in teams.top_division and 
+                g[4] not in teams.top_division):
+                continue
             try: date = datetime.strptime(g[1], '%m-%d-%Y').strftime('%Y-%m-%d')
             except ValueError: date = g[1] + '-08-25'
             try: score2 = int(g[5])
-            except ValueError: score2 = int(g[6])
+            except ValueError:
+                try: score2 = int(g[6])
+                except ValueError: score2 = int(g[7])
             games_dict.append({
                 'season': int(date[:4]) - (int(date[5:7]) < 7),
                 'date': date,
