@@ -5,14 +5,14 @@ from bs4 import BeautifulSoup as bs
 import re
 from datetime import datetime
 
-# TODO
+# TODO: refactor - CFB Data Warehouse is defunct, scraper no longer works
 # add doc_strings
 # finish commenting
 # separate everything into functions instead of autorun
 
 r1 = re.compile('\n+')
 r2 = re.compile(',([WLT]),')
-r3 = re.compile('(\d\d\d\d),')
+r3 = re.compile(r'(\d\d\d\d),')
 r4 = re.compile('\\\\')
 r5 = re.compile(';')
 
@@ -44,8 +44,8 @@ def add_games(t, games_page):
     games = soup.find_all('td', attrs = {'bgcolor': '#E1D2D2'})
     # clean up the resulting code a bit so its one game per line
     games_text = r5.sub('',
-                        r3.sub('\g<1>,' + str(team_names[t]) + ',',
-                               r2.sub('\r\g<1>,',
+                        r3.sub('\\g<1>,' + str(team_names[t]) + ',',
+                               r2.sub('\r\\g<1>,',
                                       r1.sub('',
                                              ','.join([g.text for g in games])))))
     # save what we've got so far
@@ -75,10 +75,10 @@ for link in soup.find_all('a'):
 for t, name in enumerate(team_names):
     if ';' in name: team_names[t] = re.sub(';', '', name)
 
-for i, t in enumerate(team_names):
-    if t not in teams.top_division:
-        del team_names[i]
-        del team_urls[i]
+team_names, team_urls = zip(*(
+    (t, u) for t, u in zip(team_names, team_urls)
+    if t in teams.top_division
+))
 
 GAMES_FILE = r'allgames.txt'
 

@@ -1,0 +1,22 @@
+[project]
+name = "cfbelo"
+version = "0.1.0"
+description = "College Football Elo Rating System"
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.31",
+    "beautifulsoup4>=4.12",
+    "matplotlib>=3.7",
+]
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["elo", "teams", "alltimegames"]
+
+[project.optional-dependencies]
+dev = [
+    "seaborn",
+]
