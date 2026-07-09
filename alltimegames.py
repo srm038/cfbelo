@@ -4,6 +4,9 @@ import requests as req
 from bs4 import BeautifulSoup as bs
 import re
 from datetime import datetime
+import os
+import tempfile
+import shutil
 
 # TODO: refactor - CFB Data Warehouse is defunct, scraper no longer works
 # add doc_strings
@@ -80,7 +83,7 @@ team_names, team_urls = zip(*(
     if t in teams.top_division
 ))
 
-GAMES_FILE = r'allgames.txt'
+GAMES_FILE = r'allgames.csv'
 
 
 # create or clear out existing data file
@@ -199,13 +202,12 @@ def clean_up(GAMES_FILE):
     # see how many we were able to scrub out
     print('# of unique games: ' + str(len(unique_games)))
 
-    # clean out the data file
-    open(GAMES_FILE, 'w').close()
-
-    # save the newly cleaned data back to the data file
-    with open(GAMES_FILE, 'a') as f:
+    # write to temp file then replace atomically
+    fd, tmp_path = tempfile.mkstemp(dir=os.path.dirname(GAMES_FILE) or '.')
+    with os.fdopen(fd, 'w') as f:
         for g in unique_games:
             f.write(g + '\n')
+    shutil.move(tmp_path, GAMES_FILE)
 
             # get_games()
             # clean_up(GAMES_FILE)

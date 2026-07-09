@@ -1,5 +1,7 @@
 from operator import itemgetter
 import os
+import tempfile
+import shutil
 import teams
 
 from math import log
@@ -13,7 +15,7 @@ P = 0.001
 INIT = 1000
 REG = 1 / 4
 HERE = os.path.dirname(os.path.abspath(__file__))
-GAMES_FILE = os.path.join(HERE, "allgames.txt")
+GAMES_FILE = os.path.join(HERE, "allgames.csv")
 TEAM_NAMES = []
 
 for t in teams.top_division:
@@ -198,7 +200,7 @@ def accuracy():
     return acc / len(games)
 
 
-def print_elo(game):
+def print_elo(game, file=None):
     """ """
 
     if not top_div(game["team1"], game["season"]) or not top_div(
@@ -206,35 +208,33 @@ def print_elo(game):
     ):
         return
 
-    with open(GAMES_FILE, "a") as f:
-        f.write(
-            ",".join(
-                [
-                    str(game["season"]),
-                    game["date"],
-                    game["team1"],
-                    str(game["score1"]),
-                    game["team2"],
-                    str(game["score2"]),
-                    str(game["elo1"]),
-                    str(game["elo2"]),
-                    str(game["change1"]),
-                    str(game["change2"]),
-                ]
-            )
-            + "\n"
+    out = (
+        ",".join(
+            [
+                str(game["season"]),
+                game["date"],
+                game["team1"],
+                str(game["score1"]),
+                game["team2"],
+                str(game["score2"]),
+                str(game["elo1"]),
+                str(game["elo2"]),
+                str(game["change1"]),
+                str(game["change2"]),
+            ]
         )
+        + "\n"
+    )
+    if file:
+        file.write(out)
+    else:
+        with open(GAMES_FILE, "a") as f:
+            f.write(out)
 
 
 global games
 averageelo = []
 games = []
-
-
-def clear_file():
-    """ """
-
-    open(GAMES_FILE, "w").close()
 
 
 def do_all_elo():
@@ -251,12 +251,13 @@ def do_all_elo():
             games.append(read_game(line))
     print(len(games))
 
-    clear_file()
-
-    for game in games:
-        if game:
-            elo(game)
-            print_elo(game)
+    fd, tmp_path = tempfile.mkstemp(dir=os.path.dirname(GAMES_FILE) or ".")
+    with os.fdopen(fd, "w") as tmp:
+        for game in games:
+            if game:
+                elo(game)
+                print_elo(game, file=tmp)
+    shutil.move(tmp_path, GAMES_FILE)
 
     global averageelo
     firstseason = games[0]["season"]
