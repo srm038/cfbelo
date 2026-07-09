@@ -1,51 +1,43 @@
 # CFB Elo
 
-## Goal
+Ground-up Elo rating system for college football, covering games from 1869 through the 2026 season.
 
-The purpose of this project is to build a ground-up Elo rating system for college football teams. This will utilize games from all times in American football history.
+## Data
 
-## Challenges
+All games are in `allgames.csv` — a CSV with columns:
+`season,date,team1,score1,team2,score2,elo1,elo2,change1,change2`
 
-### Data
+~76,000 games spanning 1869–2026, covering all top-division teams (FBS, I-A, University Division, and pre-1937 major programs).
 
-While data for all games from all time does exist, it's fairly fragmented. As usual, the first and biggest challenge to any data analysis project is getting the data into a workable format. I'm scraping from the [CFB Data Warehouse](http://cfbdatawarehouse.com/index.php) for now.
+The original scraper (`alltimegames.py`) targeted [CFB Data Warehouse](http://cfbdatawarehouse.com/), which is now defunct. The data file is maintained directly.
 
-### Design Options
+## Design
 
-I'll be basing a lot of the actual rating system on [Five Thirty-Eight's NFL Elo Ratings](http://fivethirtyeight.com/datalab/nfl-elo-ratings-are-back/). However, the professional nature of this league (as well as the NBA Ratings, also by Five Thirty-Eight) means that it's largely a closed system, and it's relatively simple to deal with expansion teams. There are also always less than 50 teams at any one time.
+Based on [FiveThirtyEight's NFL Elo](http://fivethirtyeight.com/datalab/nfl-elo-ratings-are-back/), adapted for college football's open/conference system. Games involving non-top-division opponents are discarded (like FIFA disregarding friendlies). Teams that later returned to the top division retain their Elo across absences.
 
-College is much more complicated, if even by the additional number of teams. CFB Data Warehouse provides mostly complete data on teams from FBS, FCS, Div II, Div III, NAIA, and even NCCAA. Parameter choice aside, I have to come up with some rule to choose which teams to include.
+Parameters:
+- **K** = 17
+- **C** = 2.2
+- **P** = 0.001
+- **INIT** = 1000
+- **REG** = 1/4 (regression toward mean during offseason)
 
-Eventually, I decided to consider teams that played in the top division during the following eras:
+## Usage
 
-- Pre-1937. Many teams dropped to lower divisions at this time, if they hadn't ceased entirely already.
-- University Division
-- Division I
-- Division I-A (or FBS)
+```bash
+pip install -e ".[dev]"
+python -c "from elo import do_all_elo; do_all_elo()"
+```
 
-If a team dropped out but got back in, their Elo was preserved. This has the added design benefit of preserving a value for teams that have yet to move into the FBS but have played previously. There are increasingly fewer teams that this applies to, but we can handle them nonetheless.
+Outputs `allgames.csv` with updated Elo values and `Elo.csv` with season-by-season ratings.
 
-Originally, I had intended to punish teams for losing to out-of-division opponents, but it's much simpler to disregard these games altogether, much like FIFA disregards friendly matches.
+## Key Files
 
-So far, I have data for games from all of Divisions I and II, and most of III.
-
-### History
-
-![Rutgers](assets/Rutgers.png)
-
-The NCAA as we know it wasn't founded until 1906 as the IAAUS, almost 40 years after the first football game.
-
-In 1937, the NCAA introduced classification, but many teams weren't officially categorized into University or College Division until much later.
-
-In 1973, these two divisions further divided into Divisions I, II, and III.
-
-In 1978, Division I split yet again into I-A and I-AA, which would later be renamed FBS and FCS, respectively.
-
-## Python Packages Used
-
-- requests
-- beautifulsoup
-- re
-- datetime
-- matplotlib
-- seaborn
+| File | Purpose |
+|------|---------|
+| `elo.py` | Elo engine: `do_all_elo()` to run, `show_all()` to plot |
+| `alltimegames.py` | Original scraper (defunct — CFB Data Warehouse down) |
+| `teams.py` | ~428 teams with top-division year ranges through 2026 |
+| `allgames.csv` | ~76K games in 10-column CSV format |
+| `Elo.csv` | Season-by-season team ratings |
+| `pyproject.toml` | Project config and dependencies |
