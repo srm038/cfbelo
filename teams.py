@@ -523,7 +523,7 @@ top_division = {
     + list(range(1978, 2026 + 1)),
     "North Carolina-Charlotte": list(range(2015, 2026 + 1)),
     "North Central (IL)": list(range(1897, 1937 + 1)),
-    "North Dakota St.": list(range(1894, 1937 + 1)),
+    "North Dakota St.": list(range(1894, 1937 + 1)) + list(range(2026, 2026 + 1)),
     "North Dakota": list(range(1894, 1937 + 1)),
     "North Texas": list(range(1913, 1937 + 1))
     + list(range(1957, 1972 + 1))
@@ -632,6 +632,7 @@ top_division = {
     "Saint Bonaventure (NY)": list(range(1895, 1937 + 1)),
     "Saint Francis (NY)": list(range(1893, 1937 + 1)),
     "Saint Francis (PA)": list(range(1909, 1937 + 1)),
+    "Sacramento St.": list(range(2026, 2026 + 1)),
     "Sam Houston St. (TX)": list(range(1912, 1937 + 1)) + list(range(2023, 2026 + 1)),
     "Samford (AL)": list(range(1902, 1937 + 1)),
     "San Diego St. (CA)": list(range(1921, 1937 + 1))

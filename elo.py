@@ -362,7 +362,7 @@ def top_wins(n):
 
 def w(team, game):
 
-    dr = (game["elo1"] - 1000) if team == game["team1"] else (game["elo2"] - 1000)
+    dr = (game["elo1"] - game["elo2"]) if team == game["team1"] else (game["elo2"] - game["elo1"])
     w = 1 / (10 ** (-dr / 400) + 1)
     return w
 
